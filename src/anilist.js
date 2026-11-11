@@ -64,7 +64,7 @@ async function requestAniList(query,variables={}) {
   }
   if(payload.errors?.length) {
    const detail=payload.errors.map(item=>item.message||"Unknown GraphQL error").join("; ");
-   console.error(JSON.stringify({level:"error",service:"AniList",operation:"graphql-response",timestamp:new Date().toISOString(),errors:payload.errors});
+   console.error(JSON.stringify({level:"error",service:"AniList",operation:"graphql-response",timestamp:new Date().toISOString(),errors:payload.errors}));
    throw new Error(detail);
   }
   return payload.data;
