@@ -46,7 +46,7 @@ async function handleRequest(request,env) {
     if(url.pathname.startsWith("/api/")) return await apiRouter(request);
     return env.ASSETS.fetch(request);
   } catch(error) {
-    log("error","Request failed",requestId,{path:url.pathname,error:error instanceof Error?error.message:"Unknown error"});
+    log("error","Request failed",requestId,{path:url.pathname,method:request.method,error:error instanceof Error?error.message:String(error),stack:error instanceof Error?error.stack:undefined});
     const status=error?.message==="Request body too large"?413:500;
     return json({error:status===413?"Payload too large.":"Internal server error.",requestId},status);
   }
