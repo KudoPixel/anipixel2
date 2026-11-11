@@ -16,7 +16,7 @@ async function showList(env,chatId,category,page,oldMessageId) {
   if(!result?.media?.length) { await sendMessage(env.BOT_TOKEN,chatId,"No results found."); return; }
   const stateId=await saveState(env,{category,page}), keyboard=buildListKeyboard(result.media,category,page,stateId);
   const lines=result.media.map((item,index)=>`${index+1}. ${escapeHTML(titleOf(item))}${item.averageScore?` · ${item.averageScore}%`:""}`);
-  if(oldMessageId) { try { await deleteMessage(env.BOT_TOKEN,chatId,oldMessageId); } catch {} }
+  if(oldMessageId) { try { await deleteMessage(env.BOT_TOKEN,chatId,oldMessageId); } catch (error) { console.warn(JSON.stringify({ level: "warn", service: "TelegramBot", operation: "deleteMessage", timestamp: new Date().toISOString(), error: error instanceof Error ? error.message : String(error) })); } }
   await sendMessage(env.BOT_TOKEN,chatId,`<b>${escapeHTML(category[0].toUpperCase()+category.slice(1))}</b>\n\n${lines.join("\n")}\n\nPage ${page}`,keyboard);
 }
 async function showSearch(env,chatId,query) {
@@ -33,7 +33,7 @@ async function showDetail(env,chatId,messageId,mediaId,stateId) {
   const title=escapeHTML(titleOf(media)), genres=(media.genres||[]).slice(0,5).map(escapeHTML).join(", ")||"—";
   const score=media.averageScore?`${media.averageScore}%`:"N/A", status=escapeHTML(media.status||"Unknown");
   const caption=`<b>${title}</b>\n\n<b>Genres:</b> ${genres}\n<b>Score:</b> ${score}\n<b>Status:</b> ${status}`;
-  if(messageId) { try { await deleteMessage(env.BOT_TOKEN,chatId,messageId); } catch {} }
+  if(messageId) { try { await deleteMessage(env.BOT_TOKEN,chatId,messageId); } catch (error) { console.warn(JSON.stringify({ level: "warn", service: "TelegramBot", operation: "deleteMessage", timestamp: new Date().toISOString(), error: error instanceof Error ? error.message : String(error) })); } }
   await sendPhoto(env.BOT_TOKEN,chatId,media.coverImage?.extraLarge||media.coverImage?.large,caption,detailKeyboard(media.id,stateId,env.WEB_APP_URL));
 }
 async function handleMessage(env,message) {
@@ -46,7 +46,7 @@ async function handleCallback(env,callback) {
   const chatId=callback.message?.chat?.id, messageId=callback.message?.message_id, data=String(callback.data||"");
   await answerCallback(env.BOT_TOKEN,callback.id);
   if(data==="m") {
-    if(messageId) { try { await deleteMessage(env.BOT_TOKEN,chatId,messageId); } catch {} }
+    if(messageId) { try { await deleteMessage(env.BOT_TOKEN,chatId,messageId); } catch (error) { console.warn(JSON.stringify({ level: "warn", service: "TelegramBot", operation: "deleteMessage", timestamp: new Date().toISOString(), error: error instanceof Error ? error.message : String(error) })); } }
     await sendMessage(env.BOT_TOKEN,chatId,"Choose a category:",mainKeyboard()); return;
   }
   const listMatch=data.match(/^l:(trending|popular|romance|comedy|mystery):(\d{1,2})$/);
