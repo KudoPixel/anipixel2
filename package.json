@@ -1,0 +1,15 @@
+{
+  "name": "anipixel2",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "wrangler types --check",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "wrangler": "^4.45.0"
+  }
+}
