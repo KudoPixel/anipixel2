@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#10131b">
+  <meta name="description" content="Discover anime and manga with AniPixel.">
+  <title>AniPixel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="AniPixel home"><span class="brand-mark">A</span><span>AniPixel</span></a>
+    <form id="search-form" class="search-form">
+      <select id="search-type" aria-label="Search type"><option value="ANIME">Anime</option><option value="MANGA">Manga</option></select>
+      <input id="search-input" type="search" placeholder="Search titles..." autocomplete="off" maxlength="80">
+      <button class="search-button" type="submit" aria-label="Search">⌕</button>
+    </form>
+    <button id="home-button" class="icon-button" type="button" aria-label="Home">⌂</button>
+  </header>
+  <main id="app" class="page-shell">
+    <section id="loading" class="loading-state"><span class="spinner"></span><p>Loading AniPixel</p></section>
+    <section id="home-view" class="view hidden">
+      <div class="hero"><div><p class="eyebrow">YOUR NEXT FAVORITE STARTS HERE</p><h1>Find your <span>next story.</span></h1><p class="hero-copy">Explore seasonal hits, timeless favorites and stories worth discovering.</p></div><div class="hero-art" aria-hidden="true"><span>アニメ</span><i></i><b></b></div></div>
+      <div id="search-results" class="section hidden"><div class="section-heading"><div><p class="eyebrow">DISCOVER</p><h2>Search results</h2></div><span id="search-count" class="muted"></span></div><div id="search-grid" class="poster-grid"></div></div>
+      <div id="collections"></div>
+    </section>
+    <section id="detail-view" class="view hidden"></section>
+    <section id="error-view" class="error-state hidden"><h2>Something went wrong</h2><p id="error-message">Please try again.</p><button id="retry-button" class="primary-button">Try again</button></section>
+  </main>
+  <footer class="footer"><span>AniPixel</span><span>Data provided by AniList</span></footer>
+</body>
+</html>
