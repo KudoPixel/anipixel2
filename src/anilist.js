@@ -43,9 +43,30 @@ const DETAIL_QUERY=`
 async function requestAniList(query,variables={}) {
  const controller=new AbortController(), timeout=setTimeout(()=>controller.abort(),REQUEST_TIMEOUT_MS);
  try {
-  const response=await fetch(API_URL,{method:"POST",headers:{"content-type":"application/json",accept:"application/json"},body:JSON.stringify({query,variables}),signal:controller.signal});
-  if(!response.ok) throw new Error(`AniList returned HTTP ${response.status}`);
-  const payload=await response.json(); if(payload.errors?.length) throw new Error(payload.errors[0]?.message||"AniList GraphQL error");
+  let response;
+  try {
+   response=await fetch(API_URL,{method:"POST",headers:{"content-type":"application/json",accept:"application/json"},body:JSON.stringify({query,variables}),signal:controller.signal});
+  } catch(error) {
+   console.error(JSON.stringify({level:"error",service:"AniList",operation:"fetch",timestamp:new Date().toISOString(),error:error instanceof Error?error.message:String(error),stack:error instanceof Error?error.stack:undefined}));
+   throw error;
+  }
+  const responseBody=await response.text();
+  let payload;
+  try { payload=responseBody?JSON.parse(responseBody):{}; }
+  catch(error) {
+   console.error(JSON.stringify({level:"error",service:"AniList",operation:"parse-response",status:response.status,timestamp:new Date().toISOString(),responseBody:responseBody.slice(0,2000),error:error instanceof Error?error.message:String(error)}));
+   throw new Error(`AniList returned invalid JSON (HTTP ${response.status})`);
+  }
+  if(!response.ok) {
+   const detail=payload?.errors?.map(item=>item.message).filter(Boolean).join("; ")||responseBody.slice(0,1000)||response.statusText;
+   console.error(JSON.stringify({level:"error",service:"AniList",operation:"graphql-request",status:response.status,statusText:response.statusText,timestamp:new Date().toISOString(),error:detail,queryName:query.match(/query\\s+(\\w+)/)?.[1]||"anonymous"}));
+   throw new Error(`AniList returned HTTP ${response.status}: ${detail}`);
+  }
+  if(payload.errors?.length) {
+   const detail=payload.errors.map(item=>item.message||"Unknown GraphQL error").join("; ");
+   console.error(JSON.stringify({level:"error",service:"AniList",operation:"graphql-response",timestamp:new Date().toISOString(),errors:payload.errors});
+   throw new Error(detail);
+  }
   return payload.data;
  } finally { clearTimeout(timeout); }
 }
