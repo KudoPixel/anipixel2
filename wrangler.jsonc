@@ -1,0 +1,24 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "anipixel2",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-11",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "BOT_STATE",
+      "id": "REPLACE_WITH_KV_NAMESPACE_ID"
+    }
+  ],
+  "observability": {
+    "enabled": true,
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.1
+    }
+  }
+}
