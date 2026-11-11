@@ -2,11 +2,28 @@ const TELEGRAM_API = "https://api.telegram.org";
 
 export async function telegramRequest(token, method, payload) {
   if (!token) throw new Error("BOT_TOKEN is not configured");
-  const response = await fetch(`${TELEGRAM_API}/bot${token}/${method}`, {
-    method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload),
-  });
-  const result = await response.json();
-  if (!response.ok || !result.ok) throw new Error(result.description || `Telegram API error (${response.status})`);
+  let response;
+  try {
+    response = await fetch(`${TELEGRAM_API}/bot${token}/${method}`, {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload),
+    });
+  } catch (error) {
+    console.error(JSON.stringify({ level: "error", service: "Telegram", method, timestamp: new Date().toISOString(), error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined }));
+    throw error;
+  }
+  const body = await response.text();
+  let result;
+  try {
+    result = body ? JSON.parse(body) : {};
+  } catch (error) {
+    console.error(JSON.stringify({ level: "error", service: "Telegram", method, status: response.status, timestamp: new Date().toISOString(), responseBody: body.slice(0, 2000), error: error instanceof Error ? error.message : String(error) }));
+    throw new Error(`Telegram returned invalid JSON (HTTP ${response.status})`);
+  }
+  if (!response.ok || !result.ok) {
+    const detail = result.description || body.slice(0, 1000) || `HTTP ${response.status}`;
+    console.error(JSON.stringify({ level: "error", service: "Telegram", method, status: response.status, errorCode: result.error_code || null, timestamp: new Date().toISOString(), error: detail }));
+    throw new Error(`Telegram API error (${response.status}): ${detail}`);
+  }
   return result.result;
 }
 export function mainKeyboard() {
